@@ -732,12 +732,12 @@ var pubSea = {
      res:[1, 2, 4, 5, 1, 23]
      * */
     steamroller: function (arr) {
-        var newArr = [];
+        var newArr = [], _this = this;
         for (var i = 0; i < arr.length; i++) {
             if (Array.isArray(arr[i])) {
                 // 如果是数组，调用(递归)steamroller 将其扁平化
                 // 然后再 push 到 newArr 中
-                newArr.push.apply(newArr, this.steamroller(arr[i]));
+                newArr.push.apply(newArr, _this.steamroller(arr[i]));
             } else {
                 // 不是数组直接 push 到 newArr 中
                 newArr.push(arr[i]);
@@ -764,12 +764,12 @@ var pubSea = {
      res:[1, 2, 4, 5, 1, 23]
      */
     steamroller2: function (arr) {
-        var newArr = [];
+        var newArr = [], _this = this;
         for (var i = 0; i < arr.length; i++) {
             if (Array.isArray(arr[i])) {
                 // 如果是数组，调用(递归)steamroller 将其扁平化
                 // 然后再 push 到 newArr 中
-                newArr = newArr.concat(this.steamroller2(arr[i]));
+                newArr = newArr.concat(_this.steamroller2(arr[i]));
             } else {
                 // 不是数组直接 push 到 newArr 中
                 newArr.push(arr[i]);
@@ -1337,26 +1337,31 @@ var pubSea = {
     // 而innerText属性是IE浏览器自己的属性,不过后来的浏览器部分实现这个属性罢了
     //设置html
     html: function (obj) {
-        if (arguments.length === 0) {
-            return this.innerHTML;
-        } else if (arguments.length === 1) {
-            this.innerHTML = arguments[0];
+        if (arguments.length === 1) {
+            return obj.innerHTML;
+        } else if (arguments.length === 2) {
+            obj.innerHTML = arguments[1];
         }
     },
 
     //设置文本内容
     text: function (obj) {
-        if (arguments.length === 0) {
-            return this.innerText;
-        } else if (arguments.length === 1) {
-            this.innerText = arguments[0];
+        if (arguments.length === 1) {
+            return obj.innerHTML;
+        } else if (arguments.length === 2) {
+            obj.innerHTML = this.filterStr(arguments[1], 'html');
         }
     },
 
-
     //显示隐藏
     show: function (obj) {
-        obj.style.display = "";
+        var blockArr = ['div', 'li', 'ul', 'ol', 'dl', 'table', 'article', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'hr', 'header', 'footer', 'details', 'summary', 'section', 'aside', '']
+        if (blockArr.indexOf(obj.tagName.toLocaleLowerCase()) === -1) {
+            obj.style.display = 'inline';
+        }
+        else {
+            obj.style.display = 'block';
+        }
     },
     hide: function (obj) {
         obj.style.display = "none";
@@ -1442,50 +1447,74 @@ var pubSea = {
     //【十一、图片相关】
     //图片没加载出来时用一张图片代替
     /*
-
+     原写法
      * */
-    aftLoadImg: function (obj, url, cb) {
+    //imgLoadError: function (obj, url, cb) {
+    //    var oImg = new Image(), _this = this;
+    //    oImg.onerror = "";
+    //    oImg.src = url;
+    //    oImg.onerror = null;
+    //    oImg.onload = function () {
+    //        obj.src = oImg.src;
+    //        if (cb && _this.istype(cb, 'function')) {
+    //            cb(obj);
+    //        }
+    //    }
+    //},
+
+    /*
+     obj:DOM对象
+     url:图片地址
+     errorUrl:图片备用(错误)地址
+     cb:回调函数
+     * */
+    imgLoadError: function (obj, url, errorUrl, cb) {
         var oImg = new Image(), _this = this;
-        oImg.onerror = "";
         oImg.src = url;
-        oImg.onerror = null;
         oImg.onload = function () {
             obj.src = oImg.src;
+            if (cb && _this.istype(cb, 'function')) {
+                cb(obj);
+            }
+        };
+        oImg.onerror = function () {
+            obj.src = errorUrl;
             if (cb && _this.istype(cb, 'function')) {
                 cb(obj);
             }
         }
     },
 
-
     //图片滚动懒加载
-    //@className {string} 要遍历图片的类名
-    //@num {number} 距离多少的时候开始加载 默认 0
-    //比如，一张图片距离文档顶部3000，num参数设置200，那么在页面滚动到2800的时候，图片加载。不传num参数就滚动，num默认是0，页面滚动到3000就加载
-    //html代码
-    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>
-    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>
-    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>....
-    //data-src储存src的数据，到需要加载的时候把data-src的值赋值给src属性，图片就会加载。
-    //详细可以查看testLoadImg.html
+    /*
+     className:{string} 要遍历图片的类名
+     num:{number}距离多少的时候开始加载,默认0
+     比如，一张图片距离文档顶部3000，num参数设置200，那么在页面滚动到2800的时候，图片加载。不传num参数就滚动，num默认是0，页面滚动到3000就加载
+     errorUrl:图片备用(错误)地址
 
-    //window.onload = function() {
-    //	loadImg('load-img',100);
-    //	window.onscroll = function() {
-    //		loadImg('load-img',100);
-    //		}
-    //}
-    loadImg: function (className, num) {
-        var _className = className || 'ec-load-img', _num = num || 0, _this = this;
+     eg:html代码
+     <p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>
+     <p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>...
+     data-src储存src的数据，到需要加载的时候把data-src的值赋值给src属性，图片就会加载。
+
+     window.onload = function () {
+     pubSea.imgLazyLoad('load-img', 100, 'http://www.mwyking.com:8888/logo/chat.svg');
+     window.onscroll = function () {
+     pubSea.imgLazyLoad('load-img', 100, 'http://www.mwyking.com:8888/logo/chat.svg');
+     }
+     };
+     * */
+    imgLazyLoad: function (className, num, errorUrl) {
+        var _className = className || 'ec-load-img', _num = num || 0, _this = this, _errorUrl = errorUrl || null;
         var oImgLoad = document.getElementsByClassName(_className);
         for (var i = 0, len = oImgLoad.length; i < len; i++) {
-            if (document.documentElement.clientHeight + document.body.scrollTop > oImgLoad[i].offsetTop - _num && !oImgLoad[i].isLoad) {
+            if (document.documentElement.clientHeight + document.documentElement.scrollTop > oImgLoad[i].offsetTop - _num && !oImgLoad[i].isLoad) {
                 //记录图片是否已经加载
                 oImgLoad[i].isLoad = true;
                 //设置过渡，当图片下来的时候有一个图片透明度变化
                 oImgLoad[i].style.cssText = "transition: ''; opacity: 0;";
                 if (oImgLoad[i].dataset) {
-                    this.aftLoadImg(oImgLoad[i], oImgLoad[i].dataset.src, function (o) {
+                    this.imgLoadError(oImgLoad[i], oImgLoad[i].dataset.src, _errorUrl, function (o) {
                         setTimeout(function () {
                             if (o.isLoad) {
                                 _this.removeClass(o, _className);
@@ -1494,7 +1523,7 @@ var pubSea = {
                         }, 1000)
                     });
                 } else {
-                    this.aftLoadImg(oImgLoad[i], oImgLoad[i].getAttribute("data-src"), function (o) {
+                    this.imgLoadError(oImgLoad[i], oImgLoad[i].getAttribute("data-src"), _errorUrl, function (o) {
                         setTimeout(function () {
                             if (o.isLoad) {
                                 _this.removeClass(o, _className);
