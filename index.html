@@ -81,6 +81,7 @@
     </p>
 </div>
 </body>
+<script src="https://cdn.bootcss.com/jquery/1.10.0/jquery.js"></script>
 <script type="text/javascript" src="js/pubSea.js"></script>
 <script>
     //    var data = {
@@ -95,22 +96,35 @@
 
 
     //    console.log(pubSea.show(document.getElementsByClassName('brother1')[0]));
+    //    $.ajax({
+    //        type: 'post',
+    //        url: 'http://192.168.0.145:9002/api/Platform/Lis',
+    //        data: {
+    //            keyword: ""
+    //        },
+    //        success: function (res) {
+    //            console.log(res)
+    //        },
+    //        error: function (err) {
+    //            console.log(err)
+    //        }
+    //    });
 
-    //        pubSea.ajax({
-    //            type: 'post',
-    //            url: 'http://xxxt',
-    //            data: {
-    //                keyword: ""
-    //            },
-    //            success: function (res) {
-    //                console.log(JSON.parse(res))
-    //            },
-    //            error: function (err) {
-    //                console.log(err)
-    //            }
-    //        });
+    pubSea.ajax({
+        type: 'post',
+        url: 'http://192.168.0.145:9002/api/Platform/Lis',
+        data: {
+            keyword: ""
+        },
+        success: function (res) {
+            console.log('succ信息---------：',res)
+        },
+        error: function (err) {
+            console.log('err信息----------：',err);
+        }
+    });
 
-    //    console.log(pubSea.aftLoadImg(document.getElementById('seaImg'), 'http://www.mwyking.com:8888/logo/lang-pictures.svg'));
+    //console.log(pubSea.aftLoadImg(document.getElementById('seaImg'), 'http://www.mwyking.com:8888/logo/lang-pictures.svg'));
 
     window.onload = function () {
         pubSea.imgLazyLoad('load-img', 100, 'http://www.mwyking.com:8888/logo/chat.svg');
@@ -124,9 +138,9 @@
     //    console.log(pubSea.filterStr(str,'html,WORD,chinese,special','*','%?'))
 
 
-//    pubSea.text(document.getElementsByClassName('brother1')[0],'<div id="div1">45132134656</div>');
+    //    pubSea.text(document.getElementsByClassName('brother1')[0],'<div id="div1">45132134656</div>');
 
-    pubSea.html(document.getElementsByClassName('brother1')[0],'<div id="div1">45132134656</div>');
+    pubSea.html(document.getElementsByClassName('brother1')[0], '<div id="div1">45132134656</div>');
 
     var count = 0;
     function fn1() {
@@ -144,5 +158,6 @@
     //    },200);
 
     //    document.onmousemove = pubSea.delayFn(fn1, 100, 200);
+
 </script>
 </html>

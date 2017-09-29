@@ -1420,11 +1420,24 @@ var pubSea = {
             xmlHttp.open(obj.type, obj.url + '?' + postData, obj.async);
             xmlHttp.send(null);
         }
+        //xmlHttp.onreadystatechange = function () {
+        //    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        //        obj.success(xmlHttp.responseText);
+        //    } else {
+        //        obj.error(xmlHttp.responseText);
+        //    }
+        //};
         xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                obj.success(xmlHttp.responseText);
+            if (xmlHttp.readyState == 4) {
+                //此处可添加一个complete()方法
+                if (xmlHttp.status >= 200 && xmlHttp.status < 300 || xmlHttp.status == 304) {
+                    obj.success(JSON.parse(xmlHttp.responseText));
+                } else {
+                    //建议将xmlHttp对象返回，有时候需要根据状态码来进行错误处理
+                    obj.error(xmlHttp);
+                }
             } else {
-                obj.error(xmlHttp.responseText);
+                //进行处理也可以忽略
             }
         };
     },
