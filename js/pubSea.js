@@ -618,7 +618,7 @@ var pubSea = {
     //删除数组中下标为n的元素
     /*
      eg:removeArrayOfIndex(['test1','test2','test3','test4','test5'],2)
-     res:["test1", "test2", "test3", "test4", "test5"]
+     res:["test1", "test2", "test4", "test5"]
      * */
     removeArrayOfIndex: function (arr, index) {
         if (index > arr.length - 1 || index < 0) {
