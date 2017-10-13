@@ -355,6 +355,46 @@ var pubSea = {
         return str.replace(reg, _delimiter);
     },
 
+    //字符串截取
+    /*
+     str:原字符串
+     len:要截取多长，默认10
+     endType:结尾符,默认...,
+     eg1:cutStr('人不知而不愠，不亦君子乎？');
+     res1:"人不知而不愠，不亦君..."
+
+     eg2:cutStr('人不知而不愠，不亦君子乎？',11);
+     res2:"人不知而不愠，不亦君子..."
+
+     eg3:cutStr('人不知而不愠，不亦君子乎？',11,'%%%');
+     res3:"人不知而不愠，不亦君子%%%"
+     * */
+    cutStr: function (str, len, endType) {
+        len = len || 10;
+        endType = endType || "...";
+        var str_length = 0;
+        var str_len = str.length;
+        var str_cut = new String();
+        var char;
+        for (var i = 0; i < str_len; i++) {
+            char = str.charAt(i);
+            str_length++;
+            if (decodeURIComponent(char).length > 4) {
+                //中文字符的长度经编码之后大于4
+                str_length++;
+            }
+            str_cut = str_cut.concat(char);
+            if (str_length >= len) {
+                str_cut = str_cut.concat(endType);
+                return str_cut;
+            }
+        }
+        //如果给定字符串小于指定长度，则返回源字符串；
+        if (str_length < len) {
+            return str;
+        }
+    },
+
     //字符串过滤(html标签，表情，特殊字符)
     /*
      str:原字符串
